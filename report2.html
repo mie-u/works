@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生成AI活用促進インフォグラフィック</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Visualization & Content Choices:
+        - Report Info: What is GenAI? -> Goal: Inform -> Viz: Donut Chart (Chart.js) for GenAI capabilities (Text, Image, Code). -> Interaction: Tooltips. -> Justification: Simple visual for composition. -> Library/Method: Chart.js (Canvas).
+        - Report Info: Organizational Efficiency (MUFG 2.64M hours saved, CyberAgent 30% time saved) -> Goal: Compare/Inform -> Viz: Bar Chart (Chart.js) for quantitative impact. -> Interaction: Tooltips. -> Justification: Clear comparison of metrics. -> Library/Method: Chart.js (Canvas).
+        - Report Info: Library Task Innovation (Kuki Library, ELCIELO examples) -> Goal: Inform -> Viz: Styled HTML Cards with Unicode icons (📚). -> Interaction: Static. -> Justification: Highlights key examples clearly. -> Library/Method: HTML/CSS/Tailwind.
+        - Report Info: Personal Productivity Stats (Support: 13.8%, Professional: 59%, Programmer: 126%, Average User: 66%) -> Goal: Compare/Inform -> Viz: Bar Chart (Chart.js). -> Interaction: Tooltips. -> Justification: Direct visual of performance gains. -> Library/Method: Chart.js (Canvas).
+        - Report Info: New Skills (Prompt Engineering, Info Literacy, Logical Thinking) -> Goal: Organize -> Viz: HTML/CSS diagram (central 'AI Skills' node with connecting lines to skill boxes). -> Interaction: Static. -> Justification: Shows relationship of skills visually. -> Library/Method: HTML/CSS/Tailwind.
+        - Report Info: AI Tools Table from report -> Goal: Inform/Organize -> Viz: Styled HTML Table. -> Interaction: Static. -> Justification: Presents structured data clearly from source. -> Library/Method: HTML/CSS/Tailwind.
+        - Report Info: AI Adoption Steps (Preparation, Practice, Continuous Learning) -> Goal: Organize/Instruct -> Viz: Numbered list presented as a simple HTML/CSS Flowchart. -> Interaction: Static. -> Justification: Sequential process visualization. -> Library/Method: HTML/CSS/Tailwind.
+        CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Noto Sans JP', sans-serif; background-color: #F3F4F6; color: #1F2937; }
+        .section-title { color: #3B82F6; }
+        .stat-number { color: #F97316; }
+        .card { background-color: #FFFFFF; border-radius: 0.75rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); padding: 1.5rem; margin-bottom: 2rem; }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 300px; max-height: 350px; }
+        @media (min-width: 768px) { .chart-container { height: 350px; max-height:400px } }
+        .tool-table th, .tool-table td { border: 1px solid #E5E7EB; padding: 0.5rem 0.75rem; text-align: left; font-size: 0.875rem; }
+        .tool-table th { background-color: #E0E7FF; color: #3B82F6; }
+        .flowchart-step { border: 2px solid #3B82F6; background-color: #EFF6FF; padding: 1rem; border-radius: 0.5rem; text-align: center; margin-bottom:0.5rem; }
+        .flowchart-arrow { text-align: center; font-size: 2rem; color: #3B82F6; margin: 0.25rem 0; }
+        .skill-node-container { display: flex; flex-direction: column; align-items: center; }
+        .skill-main-node { background-color: #3B82F6; color: white; padding: 1rem; border-radius: 50%; width: 120px; height: 120px; display: flex; justify-content: center; align-items: center; text-align: center; font-weight: bold; margin-bottom: 1rem; }
+        .skill-sub-nodes { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; }
+        .skill-sub-node { background-color: #E0E7FF; color: #3B82F6; padding: 0.75rem; border-radius: 0.375rem; border: 1px solid #3B82F6; text-align: center; min-width:150px; }
+    </style>
+</head>
+<body class="antialiased leading-relaxed">
+
+    <header class="bg-white py-8 text-center shadow-lg">
+        <div class="container mx-auto px-4">
+            <h1 class="text-4xl font-bold section-title">生成AIが拓く新たな働き方</h1>
+            <p class="text-xl mt-2 text-gray-600">事務・図書館職員のための実践ガイド</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+        <section id="introduction" class="card">
+            <h2 class="text-3xl font-semibold mb-6 text-center section-title">1. 生成AIとは？私たちの未来をどう変える？</h2>
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div>
+                    <p class="text-lg mb-4">生成AIは、テキスト、画像、音声、プログラムコードなど、学習データに基づいて「新しいコンテンツを創造する」人工知能です。従来のAIが主に分類や予測を得意としていたのに対し、生成AIは「創造」する点で大きく異なります。</p>
+                    <p class="text-lg mb-4">この技術は、私たちの働き方や日々の業務に大きな変化をもたらす可能性を秘めています。このガイドを通じて、その可能性を探りましょう。</p>
+                    <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 rounded-md" role="alert">
+                        <p class="font-bold">本ガイドの目的：</p>
+                        <p>事務職員および図書館職員の皆様が生成AIを理解し、積極的に活用するマインドセットを醸成すること。</p>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="genAiCapabilitiesChart"></canvas>
+                    <p class="text-center text-sm mt-2 text-gray-500">生成AIができること（一例）</p>
+                </div>
+            </div>
+            <div class="mt-8 text-center bg-orange-50 p-6 rounded-lg">
+                <p class="text-2xl font-bold text-gray-700">ビジネスユーザーの処理能力が平均</p>
+                <p class="text-5xl font-extrabold stat-number my-2">66%向上！</p>
+                <p class="text-gray-600">(出典: U-SITE調査 [17])</p>
+                <p class="mt-3 text-md text-gray-700">これは、米国の平均労働生産性の伸び <strong class="stat-number">47年分</strong>に相当します。</p>
+            </div>
+        </section>
+
+        <section id="organizational-impact" class="card">
+            <h2 class="text-3xl font-semibold mb-6 text-center section-title">2. 組織を強くするAIの力 <span class="text-2xl">⚙️</span></h2>
+            <p class="text-center text-lg mb-8 text-gray-700">生成AIは、業務効率化、コスト削減、新しい価値の創造を通じて、組織全体の力を底上げします。</p>
+
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                <div>
+                    <h3 class="text-2xl font-semibold mb-4 text-blue-600">日々の業務を、もっとスムーズに</h3>
+                    <div class="space-y-4">
+                        <div class="bg-blue-50 p-4 rounded-lg shadow">
+                            <h4 class="font-bold text-blue-700">事務作業の効率化事例：</h4>
+                            <ul class="list-disc list-inside text-gray-700 mt-2">
+                                <li>三菱UFJ銀行：稟議書類作成の自動化で年間<strong class="stat-number">264万時間</strong>の業務負担軽減。</li>
+                                <li>NEC：議事録自動生成で会議後の作業時間<strong class="stat-number">50%</strong>削減。</li>
+                                <li>LINE：GitHub Copilot使用で開発者の作業時間<strong class="stat-number">1日約2時間</strong>削減。</li>
+                            </ul>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-lg shadow">
+                            <h4 class="font-bold text-green-700">図書館業務の革新事例： <span class="text-xl">📚</span></h4>
+                            <ul class="list-disc list-inside text-gray-700 mt-2">
+                                <li>埼玉県久喜市立図書館：興味テーマでの蔵書検索をAIが支援。</li>
+                                <li>KCCS「ELCIELO」：AIが質問からキーワードを抽出し、的確な書籍を提案。</li>
+                                <li>論文・レポート要約、多言語翻訳、感情分析などで利用者サービス向上。</li>
+                            </ul>
+                            <p class="mt-2 text-sm text-green-600">職員はより専門的な業務へ注力可能に！</p>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-semibold mb-4 text-orange-600">コスト削減と価値創造 <span class="text-xl">💰</span></h3>
+                     <div class="chart-container mb-4">
+                        <canvas id="costSavingChart"></canvas>
+                        <p class="text-center text-sm mt-2 text-gray-500">生成AIによるコスト・時間削減効果</p>
+                    </div>
+                    <p class="text-gray-700 mb-3">リフラックス社：カスタマーサポートコストを1件あたり2000円→1500円に削減（年間約1500万円）。</p>
+                    <p class="text-gray-700">横須賀市：ChatGPT導入で年間<strong class="stat-number">22,700時間</strong>の業務時間削減。</p>
+                </div>
+            </div>
+
+            <h3 class="text-2xl font-semibold mb-4 text-center text-purple-600">新しいアイデアと体験を創出 <span class="text-xl">💡</span></h3>
+            <div class="grid md:grid-cols-3 gap-6 text-center">
+                <div class="bg-purple-50 p-4 rounded-lg shadow">
+                    <h4 class="font-bold text-purple-700 mb-1">商品開発</h4>
+                    <p class="text-sm text-gray-600">江崎グリコ：需要予測で新商品アイデア創出、開発期間短縮。</p>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-lg shadow">
+                    <h4 class="font-bold text-purple-700 mb-1">顧客体験向上</h4>
+                    <p class="text-sm text-gray-600">ナノ・ユニバース：AIチャットボットで売上<strong class="stat-number">20%増</strong>。</p>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-lg shadow">
+                    <h4 class="font-bold text-purple-700 mb-1">クリエイティブ制作</h4>
+                    <p class="text-sm text-gray-600">セブンイレブン：商品企画時間を最大<strong class="stat-number">90%</strong>削減。</p>
+                </div>
+            </div>
+            <p class="mt-6 text-center text-gray-700 font-semibold">AIは「効率化ツール」から「イノベーションの源泉」へ。自社独自のデータと組み合わせることで、真の競争優位性を確立できます。</p>
+        </section>
+
+        <section id="personal-empowerment" class="card">
+            <h2 class="text-3xl font-semibold mb-6 text-center section-title">3. あなたの可能性を広げるAI <span class="text-2xl">🚀</span></h2>
+            <p class="text-center text-lg mb-8 text-gray-700">生成AIは、個人の生産性を高め、新しいスキル習得を助け、創造性を刺激します。</p>
+            <div class="grid md:grid-cols-2 gap-8 items-start">
+                <div>
+                    <h3 class="text-2xl font-semibold mb-4 text-blue-600">時間を取り戻し、生産性を高める <span class="text-xl">📈</span></h3>
+                    <div class="chart-container">
+                        <canvas id="productivityGainChart"></canvas>
+                        <p class="text-center text-sm mt-2 text-gray-500">生成AI利用による業務処理能力の向上率</p>
+                    </div>
+                    <p class="mt-4 text-gray-700">AIは特に認知負荷の高いタスクで生産性を向上させ、パフォーマンスが下位の従業員の能力をより大きく引き上げ、組織全体のスキル差を縮小する効果があります。</p>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-semibold mb-4 text-green-600">新しいスキルを学び、創造性を刺激する <span class="text-xl">🧠</span></h3>
+                    <div class="skill-node-container mb-6">
+                        <div class="skill-main-node">AI時代の<br/>重要スキル</div>
+                        <div class="skill-sub-nodes">
+                            <div class="skill-sub-node">プロンプト<br/>エンジニアリング</div>
+                            <div class="skill-sub-node">情報リテラシー</div>
+                            <div class="skill-sub-node">論理的思考力</div>
+                            <div class="skill-sub-node">継続的な学習意欲</div>
+                            <div class="skill-sub-node">データ分析技術</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-700 mb-2">AIサポートで新人の学習期間が<strong class="stat-number">8ヶ月→2ヶ月</strong>に短縮された事例も。</p>
+                    <p class="text-gray-700">AIは「パートナー」。人間固有の創造性や問題解決能力の価値を高め、キャリアアップや新たな機会を創出します。</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="ai-horizon" class="card">
+            <h2 class="text-3xl font-semibold mb-6 text-center section-title">4. AIの今とこれから <span class="text-2xl">🔭</span></h2>
+            <p class="text-center text-lg mb-8 text-gray-700">進化し続けるAI技術。最新トレンドと注目のツールをチェックしましょう。</p>
+            <h3 class="text-2xl font-semibold mb-4 text-blue-600">注目の技術トレンド</h3>
+            <div class="grid md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-blue-50 p-4 rounded-lg shadow">
+                    <h4 class="font-bold text-blue-700 mb-1">LLMの高度化</h4>
+                    <p class="text-sm text-gray-600">文章作成、データ分析、プログラミング支援がさらに進化。</p>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-lg shadow">
+                    <h4 class="font-bold text-blue-700 mb-1">AIエージェント</h4>
+                    <p class="text-sm text-gray-600">自律的に判断・行動。タスク遂行を支援。</p>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-lg shadow">
+                    <h4 class="font-bold text-blue-700 mb-1">マルチモーダルAI</h4>
+                    <p class="text-sm text-gray-600">テキスト・画像・音声を組合せ分析・処理。</p>
+                </div>
+            </div>
+
+            <h3 class="text-2xl font-semibold mb-4 text-green-600">主要生成AIツール <span class="text-xl">🛠️</span> <span class="text-sm">(情報はレポート執筆時点)</span></h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full tool-table">
+                    <thead>
+                        <tr>
+                            <th>ツール名</th>
+                            <th>主な機能</th>
+                            <th>特徴</th>
+                            <th>日本語</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>ChatGPT (OpenAI)</td><td>テキスト生成,会話,翻訳</td><td>自然な会話, GPT-4oは画像生成も</td><td>可</td></tr>
+                        <tr><td>Claude (Anthropic)</td><td>テキスト生成,推論,視覚生成</td><td>高い言語理解力, 安全性重視</td><td>可</td></tr>
+                        <tr><td>Gemini (Google)</td><td>マルチモーダル, Google連携</td><td>Googleサービス連携, 最新データ</td><td>可</td></tr>
+                        <tr><td>Microsoft Copilot</td><td>テキスト/画像生成, Office連携</td><td>Bing検索連携, Officeアプリ連携</td><td>可</td></tr>
+                        <tr><td>Adobe Firefly</td><td>画像生成/編集</td><td>高品質画像, 著作権リスク低</td><td>可</td></tr>
+                        <tr><td>Canva</td><td>画像/動画/音楽/テキスト生成</td><td>デザインツールにAI統合</td><td>可</td></tr>
+                        <tr><td>Perplexity AI</td><td>情報検索,要約,データ分析</td><td>強力な検索と生成AIの組合せ</td><td>可</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="mt-6 text-center text-gray-700">未来の働き方は「人間 vs AI」ではなく<strong class="text-orange-600">「人間 × AI」</strong>の協働モデルへ。</p>
+        </section>
+
+        <section id="adoption-guide" class="card">
+            <h2 class="text-3xl font-semibold mb-6 text-center section-title">5. AIを味方につけるために <span class="text-2xl">🤝</span></h2>
+            <p class="text-center text-lg mb-8 text-gray-700">不安を乗り越え、具体的なステップでAI活用を始めましょう。</p>
+
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                <div class="bg-red-50 p-6 rounded-lg shadow">
+                    <h3 class="text-xl font-semibold mb-3 text-red-700">誤解：「仕事が奪われる？」</h3>
+                    <p class="text-gray-700"><strong>真実：</strong>仕事の「質」が向上します。AIはルーティン業務を代行し、人間はより高度な判断や創造性を要する業務に集中できます。AIは「味方」です。</p>
+                </div>
+                <div class="bg-yellow-50 p-6 rounded-lg shadow">
+                    <h3 class="text-xl font-semibold mb-3 text-yellow-700">注意点：「AIは万能？」</h3>
+                    <p class="text-gray-700"><strong>真実：</strong>AIはあくまで「ツール」。ハルシネーション（もっともらしい嘘）、情報漏洩、著作権侵害のリスクも。人間による確認と適切なルールが不可欠です。</p>
+                </div>
+            </div>
+
+            <h3 class="text-2xl font-semibold mb-6 text-center text-blue-600">生成AI活用の3ステップ</h3>
+            <div class="space-y-2 md:space-y-0 md:flex md:justify-around md:items-start">
+                <div class="flowchart-step md:w-1/3 mx-1">
+                    <div class="text-3xl mb-2">①</div>
+                    <h4 class="font-bold text-lg mb-1">準備</h4>
+                    <p class="text-sm">課題明確化、業務プロセス可視化、ルール策定。</p>
+                </div>
+                <div class="flowchart-arrow hidden md:block md:self-center">➡️</div>
+                <div class="flowchart-step md:w-1/3 mx-1">
+                     <div class="text-3xl mb-2">②</div>
+                    <h4 class="font-bold text-lg mb-1">実践と検証</h4>
+                    <p class="text-sm">ツール選定、PoC実施、本格導入と教育。</p>
+                </div>
+                 <div class="flowchart-arrow hidden md:block md:self-center">➡️</div>
+                <div class="flowchart-step md:w-1/3 mx-1">
+                     <div class="text-3xl mb-2">③</div>
+                    <h4 class="font-bold text-lg mb-1">継続的改善</h4>
+                    <p class="text-sm">効果測定、フィードバック、技術進化への対応。</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="conclusion" class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-8 rounded-lg shadow-xl text-center">
+            <h2 class="text-3xl font-bold mb-6">さあ、AIと共に未来を創造しよう！</h2>
+            <p class="text-lg mb-4">生成AIは、業務効率化、個人の成長、そして組織の発展を力強く後押しする革新的な技術です。</p>
+            <p class="text-lg mb-6">不安を乗り越え、AIを「頼れるパートナー」として活用することで、より質の高い業務を実現し、新しい価値を創造することができます。</p>
+            <p class="text-xl font-semibold">このガイドが、皆様のAI活用への第一歩となることを願っています。</p>
+        </section>
+    </main>
+
+    <footer class="text-center py-8 mt-12 border-t border-gray-300">
+        <p class="text-sm text-gray-600">本インフォグラフィックは提供されたレポートに基づき作成されました。</p>
+        <p class="text-xs text-gray-500 mt-1">詳細な情報や参考文献は元レポートをご参照ください。</p>
+    </footer>
+
+    <script>
+        function initCharts() {
+            const commonChartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: { color: '#1F2937', font: { size: 12 } }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: function(tooltipItems) {
+                                const item = tooltipItems[0];
+                                let label = item.chart.data.labels[item.dataIndex];
+                                if (Array.isArray(label)) {
+                                  return label.join(' ');
+                                } else {
+                                  return label;
+                                }
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { ticks: { color: '#1F2937', font: {size: 11} }, grid: { display: false } },
+                    y: { ticks: { color: '#1F2937', font: {size: 11} }, grid: { color: '#E5E7EB' } }
+                }
+            };
+            
+            const CHART_COLORS = {
+                primary: 'rgba(59, 130, 246, 0.7)', // blue-500
+                secondary: 'rgba(249, 115, 22, 0.7)', // orange-500
+                accent: 'rgba(16, 185, 129, 0.7)', // green-500
+                lightBlue: 'rgba(147, 197, 253, 0.7)', // blue-300
+                lightOrange: 'rgba(253, 186, 116, 0.7)', // orange-300
+                lightGreen: 'rgba(110, 231, 183, 0.7)' // green-300
+            };
+            const CHART_BORDERS = {
+                primary: 'rgba(59, 130, 246, 1)',
+                secondary: 'rgba(249, 115, 22, 1)',
+                accent: 'rgba(16, 185, 129, 1)',
+            };
+
+            // 1. GenAI Capabilities Chart (Donut)
+            const genAiCtx = document.getElementById('genAiCapabilitiesChart')?.getContext('2d');
+            if (genAiCtx) {
+                new Chart(genAiCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['テキスト生成', '画像生成', 'コード生成', '音声合成など'],
+                        datasets: [{
+                            label: '生成AIの主な能力',
+                            data: [40, 25, 20, 15],
+                            backgroundColor: [CHART_COLORS.primary, CHART_COLORS.secondary, CHART_COLORS.accent, CHART_COLORS.lightBlue],
+                            borderColor: ['#FFFFFF'],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: { ...commonChartOptions, plugins: { ...commonChartOptions.plugins, legend: { position: 'bottom' } } }
+                });
+            }
+
+            // 2. Cost Saving Chart (Bar)
+            const costCtx = document.getElementById('costSavingChart')?.getContext('2d');
+            if (costCtx) {
+                new Chart(costCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['三菱UFJ銀行 (時間削減)', 'サイバーエージェント (時間削減率)', 'ベネッセHD (コスト削減率)'],
+                        datasets: [{
+                            label: '効果',
+                            data: [80, 30, 40], // Simplified relative scale for visual purpose. MUFG actual is 2.64M hours, represented as a high bar.
+                            backgroundColor: [CHART_COLORS.primary, CHART_COLORS.secondary, CHART_COLORS.accent],
+                            borderColor: [CHART_BORDERS.primary, CHART_BORDERS.secondary, CHART_BORDERS.accent],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: { ...commonChartOptions, 
+                        scales: { ...commonChartOptions.scales, y: { ...commonChartOptions.scales.y, 
+                            ticks: { callback: function(value, index, values) {
+                                if (index === 0) return '大幅削減(264万時間)'; // Custom label for first bar
+                                return value + '%'; // Percentage for others
+                            }}
+                        }},
+                        plugins: { ...commonChartOptions.plugins, legend: { display: false } } 
+                    }
+                });
+            }
+            
+            // 3. Productivity Gain Chart (Bar)
+            const prodCtx = document.getElementById('productivityGainChart')?.getContext('2d');
+            if (prodCtx) {
+                new Chart(prodCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['サポート担当者', '専門職', 'プログラマー', '平均ユーザー'],
+                        datasets: [{
+                            label: '処理能力向上率 (%)',
+                            data: [13.8, 59, 126, 66],
+                            backgroundColor: [CHART_COLORS.primary, CHART_COLORS.secondary, CHART_COLORS.accent, CHART_COLORS.lightOrange],
+                            borderColor: [CHART_BORDERS.primary, CHART_BORDERS.secondary, CHART_BORDERS.accent, CHART_BORDERS.secondary],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: { ...commonChartOptions, plugins: { ...commonChartOptions.plugins, legend: { display: false } }, scales: {...commonChartOptions.scales, y: {...commonChartOptions.scales.y, title: {display:true, text:'向上率 (%)', color: '#1F2937'}}} }
+                });
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', initCharts);
+    </script>
+</body>
+</html>
